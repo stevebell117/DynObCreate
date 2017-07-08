@@ -27,9 +27,7 @@ namespace DynObCreate
 
                     tempObj.Add(columnName, null);
 
-                    tempObj[columnName] = Helper.Lists.InstantiateDynamicList(sqlTable.Rows[0].ItemArray[columnIndex]);
-
-                    columnIndex++;
+                    tempObj[columnName] = Helper.Lists.InstantiateDynamicList(sqlTable.Rows[0].ItemArray[columnIndex++]);
                 }
 
                 foreach (DataRow row in sqlTable.Rows)
@@ -42,7 +40,7 @@ namespace DynObCreate
 
                         IList listPtr = (IList)tempObj[columnName];
 
-                        listPtr.Add(item);
+                        listPtr?.Add(item);
                     }
                 }
             }
