@@ -20,7 +20,7 @@ namespace DynObCreateTestSuite
             table.Rows.Add("Code1", 1, true);
             table.Rows.Add("Code2", 2, false);
 
-            API obj = new API(table);
+            DynamicObjectCreate obj = new DynamicObjectCreate(table);
 
             dynamic dynObj = obj.GetDynamicObject();
 

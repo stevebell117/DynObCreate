@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
@@ -9,11 +10,49 @@ using System.Threading.Tasks;
 
 namespace DynObCreate
 {
-    public class API
+    public class DynamicObjectCreate
     {
         private dynamic obj;
 
-        public API(DataTable sqlTable)
+        /// <summary>
+        /// Pass a DataTable into this API Constructor to instantiate the Dynamic Object.
+        /// </summary>
+        /// <param name="sqlTable"></param>
+        public DynamicObjectCreate(DataTable sqlTable)
+        {
+            SetDynamicObject(sqlTable);
+        }
+
+        /// <summary>
+        /// <para>Pass a SQL Query into this API Constructor to instantiate the Dynamic Object.</para>
+        /// <para>Note: Does not currently check against SQL Injection</para>
+        /// </summary>
+        /// <param name="sqlString">SQL string passed in to be executed</param>
+        /// <param name="sqlConnectionString">The SQL Connection string used to query the database</param>
+        /// <param name="sqlType">Determines if the sqlString is a query (Default), Stored Proc, or the Table Name (TableDirect). Note: TableDirect only works for OLEDB</param>
+        public DynamicObjectCreate(string sqlString, string sqlConnectionString, CommandType sqlType = CommandType.Text)
+        {
+            using(SqlConnection conn = new SqlConnection(sqlConnectionString))
+            {
+                conn.Open();
+
+                using (SqlCommand command = new SqlCommand(sqlString, conn))
+                {
+                    command.CommandType = sqlType;
+                    
+                    using(SqlDataReader reader = command.ExecuteReader())
+                    {
+                        DataTable dataTable = new DataTable();
+
+                        dataTable.Load(reader);
+
+                        SetDynamicObject(dataTable);
+                    }
+                }
+            }
+        }
+
+        private void SetDynamicObject(DataTable sqlTable)
         {
             var tempObj = new ExpandoObject() as IDictionary<string, Object>;
 
